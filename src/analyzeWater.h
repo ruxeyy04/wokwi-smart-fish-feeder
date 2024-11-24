@@ -16,6 +16,7 @@ extern int waterLevelPercent; // Water level in percentage (0-100)
 // Relays
 #define RelayPump 16          // Relay for Water Replacement (Pump)
 #define RelayDispenser 0      // Relay for Feeding (Feed Dispenser)
+#define RelayMainDispenser 5      // Relay for Feeding (Feed Dispenser)
 #define WaterCirculation 2    // Relay for Water Circulation
 
 // TDS and pH thresholds
@@ -33,25 +34,23 @@ extern int waterLevelPercent; // Water level in percentage (0-100)
 void initRelay() {
     pinMode(RelayPump, OUTPUT);
     pinMode(RelayDispenser, OUTPUT);
+    pinMode(RelayMainDispenser, OUTPUT);
     pinMode(WaterCirculation, OUTPUT);
     digitalWrite(RelayPump, LOW);         // Default to OFF
     digitalWrite(RelayDispenser, LOW);   // Default to OFF
+    digitalWrite(RelayMainDispenser, LOW);
     digitalWrite(WaterCirculation, LOW); // Default to OFF
 }
 
-// Analyze water conditions and control relays
 void analyzeWater() {
-    // Read TDS value based on current water temperature
     float tdsVal = tds.readTDS(celsius);
     display.setCursor(0, 40);
 
-
-    // Water circulation logic
     if (celsius > TEMP_HIGH) {
-        digitalWrite(WaterCirculation, HIGH); // Turn ON circulation
+        digitalWrite(WaterCirculation, HIGH); 
         display.println("Circulating water...");
     } else if (celsius < TEMP_LOW) {
-        digitalWrite(WaterCirculation, LOW); // Turn OFF circulation
+        digitalWrite(WaterCirculation, LOW);
         display.println("Circulation OFF");
     }
 
