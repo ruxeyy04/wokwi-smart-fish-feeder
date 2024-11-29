@@ -12,7 +12,8 @@
 #include "food_storage.h"
 #include "water_level.h"
 #include "analyzeWater.h"
-
+float tempGrams;
+bool feedNowStatus = false;
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
@@ -20,6 +21,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 TDSSensor tds;
 
+#include "sendData.h"
 void setup()
 {
   Serial.begin(115200);
@@ -33,6 +35,8 @@ void setup()
   tds.begin();
 }
 
+unsigned long lastSendTime = 0; // Store the last time data was sent
+
 void loop()
 {
   display.clearDisplay();
@@ -44,7 +48,13 @@ void loop()
   storageLevel();
   waterLevel();
   analyzeWater();
-  display.display();
-  delay(1000);
-}
 
+  // Check if 5 seconds have passed since the last data send
+  if (millis() - lastSendTime >= 5000) {
+    sendData(celsius, ph_act, tdsValue, storageLevelPercent, waterLevelPercent, feedNowStatus, tempGrams * 1000);
+    lastSendTime = millis(); // Update the last send time
+  }
+
+  display.display();
+  delay(100);
+}
